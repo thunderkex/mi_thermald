@@ -1,4 +1,4 @@
-name: Android Build
+name: 温控构建
 
 on:
   push:
