@@ -1,24 +1,57 @@
 # mi_thermald-mod
 
-自定义充电控制
+## Intelligent Charging Control Program
 
-本项目旨在**自动编译适用于 MIUI / HyperOS 的自定义温控守护进程**。你需要**自行将构建生成的 `mi_thermald` 文件替换原有版本**，此项目不提供原始模板文件。
+This project provides a custom thermal management daemon for MIUI / HyperOS systems. The program automatically adjusts charging power based on battery status, balancing charging speed and temperature control.
 
-本代码源自酷安 @SutoLiu 的作品，**本人在其基础上进行了二次修改**，使其在不同充电阶段下的行为更加灵活与合理，目标是在充电速度与温控表现之间取得更好的平衡。
+### Features
+
+- Supports standard and fast charging modes
+- Dynamically adjusts charging power based on battery level
+- Smart thermal control to extend battery life
+- Fully open source, transparent code
+
+### How It Works
+
+The program automatically adjusts charging current based on current battery capacity and charging type:
+- Standard charging: Maintains constant power before 80%, then reduces power
+- Fast charging: Full power before 30%, linear reduction from 30-80%, lowest power after 80%
+
+This project is optimized based on @SutoLiu's original code, with focus on improving charging strategy and thermal control logic.
 
 ---
 
-## ⚠️ 使用注意事项
+## ⚠️ Usage Precautions
 
-1. **请勿在启用了“低电疾充”等增强模块的情况下使用本程序**。这类模式可能与本程序产生冲突，导致充电行为异常，例如：  
-   - 实际电量几乎未提升  
-   - 电池温度迅速上升  
-   推荐使用**官方标准模式或极速模式**。
+1. **Do not use this program with enhanced modules like "Quick Charge for Low Battery" enabled**. Such modes may conflict with this program, causing charging anomalies, such as:  
+   - Battery level barely increases  
+   - Battery temperature rises rapidly  
+   Recommend using **official standard mode or fast mode**.
 
-2. **不建议提高功率上限**。功率过高将加剧温升，可能会导致系统触发“温度墙”，从而将充电功率瞬间拉至 0，反而减缓整体充电进度。
+2. **Not recommended to increase power limit**. Higher power will increase temperature, potentially triggering system "thermal wall", instantly dropping charging power to 0, slowing overall charging progress.
 
-3. **编译好的温控文件请前往 [GitHub Actions 页面](../../actions) 下载**，每次提交代码后将自动生成新版 `mi_thermald`，你只需进入对应构建记录，在页面底部的 Artifacts 区域获取。
+3. **Download compiled thermal control files from [GitHub Actions page](../../actions)**. New version of `mi_thermald` is auto-generated after each code commit. Just enter the corresponding build record and get it from the Artifacts section at the bottom.
 
 ---
 
-请自行测试该程序在你设备上的表现并承担相关风险。
+### 编译说明
+
+需要安装以下依赖：
+- CMake (3.10+)
+- GCC/Clang (Linux) 或 MSVC (Windows)
+
+#### Linux/Unix 系统
+```bash
+chmod +x build.sh
+./build.sh
+```
+
+#### Windows 系统
+```cmd
+build.bat
+```
+
+---
+
+Please test the program's performance on your device and assume related risks.
+
