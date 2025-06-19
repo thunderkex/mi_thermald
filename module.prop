@@ -1,0 +1,7 @@
+id=mi_thermald_mod
+name=Mi Thermal Daemon Mod
+version=v1.0.0_20240101
+versionCode=20240101
+author=thunderkex
+description=Custom thermal control daemon for MIUI/HyperOS with smart charging control
+updateJson=https://raw.githubusercontent.com/thunderkex/mi_thermald-mod/main/update.json

@@ -51,6 +51,12 @@ jobs:
 
     - name: Create KernelSU module
       run: |
+        # Get current date in YYYYMMDD format
+        DATE=$(date +%Y%m%d)
+
+        # Update module.prop
+        sed -i "s/^versionCode=.*/versionCode=$DATE/" module.prop
+        sed -i "s/^version=.*/version=v1.0.0_$DATE/" module.prop
         mkdir -p module/system/bin
         cp build/mi_thermald module/system/bin/
         cp module.prop module/
