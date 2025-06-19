@@ -3,16 +3,23 @@
 #include <unistd.h>
 #include <errno.h>
 
+/* Battery system file paths */
 #define BATTERY_STATUS_PATH "/sys/class/power_supply/battery/status"
 #define BATTERY_CHARGE_TYPE_PATH "/sys/class/power_supply/battery/charge_type"
 #define BATTERY_CAPACITY_PATH "/sys/class/power_supply/battery/capacity"
 #define BATTERY_CHARGE_CURRENT_PATH "/sys/class/power_supply/battery/constant_charge_current"
 
-#define FAST_CHARGE_MAX_CURRENT 10000000
-#define STANDARD_CHARGE_MAX_CURRENT 7000000
-#define FAST_CHARGE_MIN_CURRENT 5000000
-#define STANDARD_CHARGE_MIN_CURRENT 4000000
+/* Charging current limits (in microamps) */
+#define FAST_CHARGE_MAX_CURRENT 10000000    /* 10A - Maximum fast charging current */
+#define STANDARD_CHARGE_MAX_CURRENT 7000000  /* 7A - Maximum standard charging current */
+#define FAST_CHARGE_MIN_CURRENT 5000000      /* 5A - Minimum fast charging current */
+#define STANDARD_CHARGE_MIN_CURRENT 4000000  /* 4A - Minimum standard charging current */
 
+/**
+ * Controls the charging speed by writing to the specified sysfs file
+ * @param file_path Path to the charging current control file
+ * @param target_value Desired charging current in microamps
+ */
 void control_charge_speed(const char *file_path, int target_value)
 {
     FILE *file = fopen(file_path, "r+");
@@ -41,6 +48,10 @@ void control_charge_speed(const char *file_path, int target_value)
     fclose(file);
 }
 
+/**
+ * Reads the current battery capacity
+ * @return Battery capacity percentage (0-100) or -1 on error
+ */
 static int read_battery_capacity(void)
 {
     FILE *fp = fopen(BATTERY_CAPACITY_PATH, "r");
@@ -63,6 +74,14 @@ static int read_battery_capacity(void)
     return capacity;
 }
 
+/**
+ * Handles standard charging mode
+ * Applies appropriate current limits based on battery capacity:
+ * - ≤80%: Maximum current (7A/35W)
+ * - >80%: Reduced current (4A/20W)
+ * 
+ * @param capacity Current battery capacity (0-100)
+ */
 static void handle_standard_charging(int capacity)
 {
     if (capacity < 0) return;
@@ -73,6 +92,15 @@ static void handle_standard_charging(int capacity)
     control_charge_speed(BATTERY_CHARGE_CURRENT_PATH, target_current);
 }
 
+/**
+ * Handles fast charging mode
+ * Applies dynamic current limits based on battery capacity:
+ * - ≤30%: Maximum current (10A/50W)
+ * - 31-80%: Linear reduction from 10A to 5A
+ * - >80%: Minimum current (5A/25W)
+ * 
+ * @param capacity Current battery capacity (0-100)
+ */
 static void handle_fast_charging(int capacity)
 {
     if (capacity < 0) return;
