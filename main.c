@@ -10,7 +10,7 @@
 #define BATTERY_CHARGE_CURRENT_PATH "/sys/class/power_supply/battery/constant_charge_current"
 
 /* Charging current limits (in microamps) */
-#define FAST_CHARGE_MAX_CURRENT 10000000    /* 10A - Maximum fast charging current */
+#define FAST_CHARGE_MAX_CURRENT 12000000    /* 12A - Maximum fast charging current (60W at 5V) */
 #define STANDARD_CHARGE_MAX_CURRENT 7000000  /* 7A - Maximum standard charging current */
 #define FAST_CHARGE_MIN_CURRENT 5000000      /* 5A - Minimum fast charging current */
 #define STANDARD_CHARGE_MIN_CURRENT 4000000  /* 4A - Minimum standard charging current */
@@ -95,8 +95,8 @@ static void handle_standard_charging(int capacity)
 /**
  * Handles fast charging mode
  * Applies dynamic current limits based on battery capacity:
- * - ≤30%: Maximum current (10A/50W)
- * - 31-80%: Linear reduction from 10A to 5A
+ * - ≤30%: Maximum current (12A/60W)
+ * - 31-80%: Linear reduction from 12A to 5A
  * - >80%: Minimum current (5A/25W)
  * 
  * @param capacity Current battery capacity (0-100)
@@ -112,7 +112,7 @@ static void handle_fast_charging(int capacity)
     }
     else if (capacity <= 80)
     {
-        target_current = FAST_CHARGE_MAX_CURRENT - (capacity - 30) * 100000;
+        target_current = FAST_CHARGE_MAX_CURRENT - (capacity - 30) * 140000;
     }
     else
     {
